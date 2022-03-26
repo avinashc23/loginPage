@@ -172,16 +172,21 @@ app.post("/signUp", function(req, res) {
 
 app.post("/signIn", function(req, res, err) {
     User.findOne({ email: req.body.email }, function(err, founduser) {
-        if (founduser.password === req.body.password) {
-            res.render("loggedin", { username: founduser.name })
-        } else {
+        if(founduser){
+            if (founduser.password === req.body.password) {
+                res.render("loggedin", { username: founduser.name })
+            } else {
             if (err) {
                 console.log(err);
             } else {
                 res.render("signin", { message: "Incorrect password" });
             }
         }
+        }
     });
+    else{
+          res.render("signin", { message: "Invalid email" });
+    }
 
 })
 
