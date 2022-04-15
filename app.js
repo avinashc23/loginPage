@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+
 const bodyParser = require("body-parser");
+
 const passport = require("passport");
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
@@ -134,7 +136,7 @@ app.get("/sign-up", function(req, res) {
     res.render("signup");
 })
 
-app.get("/loggedin", function(req, res) {
+app.get("/loggedin", (req, res) => {
     res.render("loggedin", { username: name });
 })
 
@@ -146,9 +148,10 @@ const userSchema = new mongoose.Schema({
 const User = new mongoose.model("User", userSchema);
 
 app.post("/signUp", function(req, res) {
+    console.log(req.body)
     User.findOne({ email: req.body.email }, function(err, founduser) {
         if (founduser) {
-            res.render("signin", { message: "email is registered,please signin." });
+            res.render("signin", { message: "email already in use,please signin." });
         } else {
             if (err) {
                 console.log(err);
@@ -170,23 +173,24 @@ app.post("/signUp", function(req, res) {
     })
 })
 
-app.post("/signIn", function(req, res, err) {
+app.post("/signIn", function(req, res) {
     User.findOne({ email: req.body.email }, function(err, founduser) {
-        if(founduser){
+        if (founduser) {
+            console.log(founduser)
             if (founduser.password === req.body.password) {
                 res.render("loggedin", { username: founduser.name })
             } else {
-            if (err) {
-                console.log(err);
-            } else {
-                res.render("signin", { message: "Incorrect password" });
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.render("signin", { message: "Incorrect password" });
+                }
             }
-        }
+        } else {
+            res.render("signin", { message: "Invalid Email" });
         }
     });
-    else{
-          res.render("signin", { message: "Invalid email" });
-    }
+
 
 })
 
